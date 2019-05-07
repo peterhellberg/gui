@@ -60,6 +60,7 @@ type options struct {
 	title         string
 	width, height int
 	resizable     bool
+	decorated     bool
 }
 
 // Option is a functional option to the window constructor New.
@@ -87,6 +88,13 @@ func Resizable(b bool) Option {
 	}
 }
 
+// Decorated options controls if the window should have any chrome.
+func Decorated(b bool) Option {
+	return func(o *options) {
+		o.decorated = b
+	}
+}
+
 // New creates a new window with all the supplied options.
 //
 // The default title is empty and the default size is 640x480.
@@ -96,6 +104,7 @@ func New(opts ...Option) (*Window, error) {
 		width:     640,
 		height:    480,
 		resizable: false,
+		decorated: true,
 	}
 	for _, opt := range opts {
 		opt(&o)
@@ -162,6 +171,12 @@ func makeGLFWWindow(o *options) (*glfw.Window, error) {
 		glfw.WindowHint(glfw.Resizable, glfw.True)
 	} else {
 		glfw.WindowHint(glfw.Resizable, glfw.False)
+	}
+
+	if o.decorated {
+		glfw.WindowHint(glfw.Decorated, glfw.True)
+	} else {
+		glfw.WindowHint(glfw.Decorated, glfw.False)
 	}
 
 	return glfw.CreateWindow(o.width, o.height, o.title, nil, nil)
