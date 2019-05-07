@@ -29,31 +29,44 @@ func main() {
 }
 
 func loop() {
-	win, err := gui.New(gui.Title("gui-xor"), gui.Size(512, 512))
+	win, err := gui.New(
+		gui.Title("qui-xor"),
+		gui.Size(512, 512),
+		gui.Decorated(true),
+		gui.Resizable(true),
+	)
 	if err != nil {
 		return
 	}
 
-	win.Draw() <- func(dst draw.Image) image.Rectangle {
-		r := dst.Bounds()
-
-		gfx.EachPixel(r, func(x, y int) {
-			c := uint8(x ^ y)
-
-			dst.Set(x, y, gfx.ColorNRGBA(c, c%192, c, 255))
-		})
-
-		return r
-	}
-
 	for event := range win.Events() {
 		switch event.Name() {
-		case gui.EventClose, gui.EventKeyboardUp:
-			close(win.Draw())
-		default:
-			gfx.Log("Event: %+v", event)
+		case gui.EventClose:
+			win.Close()
+		case gui.EventKeyboardDown:
+			if event.Data().(string) == "escape" {
+				win.Close()
+			}
+		case gui.EventKeyboardChar:
+			if event.Data().(rune) == 'q' {
+				win.Close()
+			}
+		case gui.EventResize:
+			win.Draw() <- update
 		}
+
+		gfx.Log("Event: %+v", event)
 	}
+}
+
+func update(dst draw.Image) image.Rectangle {
+	gfx.EachPixel(dst.Bounds(), func(x, y int) {
+		c := uint8(x ^ y)
+
+		dst.Set(x, y, gfx.ColorNRGBA(c, c%192, c, 255))
+	})
+
+	return dst.Bounds()
 }
 ```
 

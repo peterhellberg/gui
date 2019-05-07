@@ -366,23 +366,23 @@ func (w *Window) openGLFlush(r image.Rectangle) {
 	gl.Flush()
 }
 
-// Event includes its name and args.
+// Event includes its name and data.
 type Event interface {
 	Name() string
-	Args() interface{}
+	Data() interface{}
 }
 
 type event struct {
 	name string
-	args interface{}
+	data interface{}
 }
 
 func (e event) Name() string {
 	return e.name
 }
 
-func (e event) Args() interface{} {
-	return e.args
+func (e event) Data() interface{} {
+	return e.data
 }
 
 func makeEventsChan() (<-chan Event, chan<- Event) {
