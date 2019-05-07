@@ -208,6 +208,11 @@ func (w *Window) Events() <-chan Event { return w.eventsOut }
 // Draw returns the draw channel of the window.
 func (w *Window) Draw() chan<- func(draw.Image) image.Rectangle { return w.draw }
 
+// Close closes the draw channel
+func (w *Window) Close() {
+	close(w.Draw())
+}
+
 func (w *Window) eventThread() {
 	var moX, moY int
 
