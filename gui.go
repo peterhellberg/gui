@@ -15,23 +15,21 @@ import (
 
 // Event constants
 const (
-	EventMouseDown      = "mouse/down"
-	EventMouseMove      = "mouse/move"
-	EventMouseScroll    = "mouse/scroll"
-	EventMouseUp        = "mouse/up"
-	EventKeyboardChar   = "keyboard/char"
-	EventKeyboardDown   = "keyboard/down"
-	EventKeyboardUp     = "keyboard/up"
-	EventKeyboardRepeat = "keyboard/repeat"
-	EventResize         = "resize"
-	EventClose          = "close"
+	EventClose           = "close"
+	EventKeyboardChar    = "keyboard/char"
+	EventKeyboardDown    = "keyboard/down"
+	EventKeyboardRepeat  = "keyboard/repeat"
+	EventKeyboardUp      = "keyboard/up"
+	EventMouseLeftDown   = "mouse/left/down"
+	EventMouseLeftUp     = "mouse/left/up"
+	EventMouseMiddleDown = "mouse/middle/down"
+	EventMouseMiddleUp   = "mouse/middle/up"
+	EventMouseMove       = "mouse/move"
+	EventMouseRightDown  = "mouse/right/down"
+	EventMouseRightUp    = "mouse/right/up"
+	EventMouseScroll     = "mouse/scroll"
+	EventResize          = "resize"
 )
-
-var buttonNames = map[glfw.MouseButton]string{
-	glfw.MouseButtonLeft:   "left",
-	glfw.MouseButtonRight:  "right",
-	glfw.MouseButtonMiddle: "middle",
-}
 
 var keyNames = map[glfw.Key]string{
 	glfw.KeyLeft:         "left",
@@ -218,25 +216,32 @@ func (w *Window) eventThread() {
 
 	w.w.SetCursorPosCallback(func(_ *glfw.Window, x, y float64) {
 		moX, moY = int(x), int(y)
-		w.eventsIn <- event{EventMouseMove, []int{moX * w.ratio, moY * w.ratio}}
+		w.eventsIn <- event{EventMouseMove, image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetMouseButtonCallback(func(_ *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
-		b, ok := buttonNames[button]
-		if !ok {
-			return
+		var name string
+
+		switch {
+		case button == glfw.MouseButtonLeft && action == glfw.Press:
+			name = EventMouseLeftDown
+		case button == glfw.MouseButtonLeft && action == glfw.Release:
+			name = EventMouseLeftUp
+		case button == glfw.MouseButtonMiddle && action == glfw.Press:
+			name = EventMouseMiddleDown
+		case button == glfw.MouseButtonMiddle && action == glfw.Release:
+			name = EventMouseMiddleUp
+		case button == glfw.MouseButtonRight && action == glfw.Press:
+			name = EventMouseRightDown
+		case button == glfw.MouseButtonRight && action == glfw.Release:
+			name = EventMouseRightUp
 		}
 
-		switch action {
-		case glfw.Press:
-			w.eventsIn <- event{EventMouseDown, []interface{}{moX * w.ratio, moY * w.ratio, b}}
-		case glfw.Release:
-			w.eventsIn <- event{EventMouseUp, []interface{}{moX * w.ratio, moY * w.ratio, b}}
-		}
+		w.eventsIn <- event{name, image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetScrollCallback(func(_ *glfw.Window, xoff, yoff float64) {
-		w.eventsIn <- event{EventMouseScroll, []int{int(xoff), int(yoff)}}
+		w.eventsIn <- event{EventMouseScroll, image.Point{int(xoff), int(yoff)}}
 	})
 
 	w.w.SetCharCallback(func(_ *glfw.Window, r rune) {
@@ -262,7 +267,7 @@ func (w *Window) eventThread() {
 	w.w.SetFramebufferSizeCallback(func(_ *glfw.Window, width, height int) {
 		r := image.Rect(0, 0, width, height)
 		w.newSize <- r
-		w.eventsIn <- event{EventResize, []int{r.Min.X, r.Min.Y, r.Max.X, r.Max.Y}}
+		w.eventsIn <- event{EventResize, r}
 	})
 
 	w.w.SetCloseCallback(func(_ *glfw.Window) {
