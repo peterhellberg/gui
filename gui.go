@@ -111,11 +111,11 @@ func New(opts ...Option) (*Window, error) {
 	eventsOut, eventsIn := makeEventsChan()
 
 	w := &Window{
-		eventsOut: eventsOut,
-		eventsIn:  eventsIn,
-		draw:      make(chan func(draw.Image) image.Rectangle),
-		newSize:   make(chan image.Rectangle),
-		finish:    make(chan struct{}),
+		out:     eventsOut,
+		in:      eventsIn,
+		draw:    make(chan func(draw.Image) image.Rectangle),
+		newSize: make(chan image.Rectangle),
+		finish:  make(chan struct{}),
 	}
 
 	var err error
@@ -188,9 +188,9 @@ type Env interface {
 
 // Window is an Env that handles an actual graphical window.
 type Window struct {
-	eventsOut <-chan Event
-	eventsIn  chan<- Event
-	draw      chan func(draw.Image) image.Rectangle
+	out  <-chan Event
+	in   chan<- Event
+	draw chan func(draw.Image) image.Rectangle
 
 	newSize chan image.Rectangle
 	finish  chan struct{}
@@ -200,8 +200,12 @@ type Window struct {
 	ratio int
 }
 
+func (w *Window) Send(e Event) {
+	w.in <- e
+}
+
 // Events returns the events channel of the window.
-func (w *Window) Events() <-chan Event { return w.eventsOut }
+func (w *Window) Events() <-chan Event { return w.out }
 
 // Draw returns the draw channel of the window.
 func (w *Window) Draw() chan<- func(draw.Image) image.Rectangle { return w.draw }
@@ -216,7 +220,7 @@ func (w *Window) eventThread() {
 
 	w.w.SetCursorPosCallback(func(_ *glfw.Window, x, y float64) {
 		moX, moY = int(x), int(y)
-		w.eventsIn <- event{EventMouseMove, image.Point{moX * w.ratio, moY * w.ratio}}
+		w.in <- event{EventMouseMove, image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetMouseButtonCallback(func(_ *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
@@ -237,15 +241,15 @@ func (w *Window) eventThread() {
 			name = EventMouseRightUp
 		}
 
-		w.eventsIn <- event{name, image.Point{moX * w.ratio, moY * w.ratio}}
+		w.in <- event{name, image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetScrollCallback(func(_ *glfw.Window, xoff, yoff float64) {
-		w.eventsIn <- event{EventMouseScroll, image.Point{int(xoff), int(yoff)}}
+		w.in <- event{EventMouseScroll, image.Point{int(xoff), int(yoff)}}
 	})
 
 	w.w.SetCharCallback(func(_ *glfw.Window, r rune) {
-		w.eventsIn <- event{EventKeyboardChar, r}
+		w.in <- event{EventKeyboardChar, r}
 	})
 
 	w.w.SetKeyCallback(func(_ *glfw.Window, key glfw.Key, _ int, action glfw.Action, _ glfw.ModifierKey) {
@@ -256,30 +260,30 @@ func (w *Window) eventThread() {
 
 		switch action {
 		case glfw.Press:
-			w.eventsIn <- event{EventKeyboardDown, k}
+			w.in <- event{EventKeyboardDown, k}
 		case glfw.Release:
-			w.eventsIn <- event{EventKeyboardUp, k}
+			w.in <- event{EventKeyboardUp, k}
 		case glfw.Repeat:
-			w.eventsIn <- event{EventKeyboardRepeat, k}
+			w.in <- event{EventKeyboardRepeat, k}
 		}
 	})
 
 	w.w.SetFramebufferSizeCallback(func(_ *glfw.Window, width, height int) {
 		r := image.Rect(0, 0, width, height)
 		w.newSize <- r
-		w.eventsIn <- event{EventResize, r}
+		w.in <- event{EventResize, r}
 	})
 
 	w.w.SetCloseCallback(func(_ *glfw.Window) {
-		w.eventsIn <- event{EventClose, nil}
+		w.in <- event{EventClose, nil}
 	})
 
-	w.eventsIn <- event{EventResize, w.img.Bounds()}
+	w.in <- event{EventResize, w.img.Bounds()}
 
 	for {
 		select {
 		case <-w.finish:
-			close(w.eventsIn)
+			close(w.in)
 			w.w.Destroy()
 			return
 		default:
@@ -375,6 +379,14 @@ func (w *Window) openGLFlush(r image.Rectangle) {
 type Event interface {
 	Name() string
 	Data() interface{}
+}
+
+// NewEvent creates a new Event
+func NewEvent(name string, data interface{}) Event {
+	return &event{
+		name: name,
+		data: data,
+	}
 }
 
 type event struct {
