@@ -3,3 +3,8 @@ language: go
 go:
  - "1.12.5"
  - "1.11.10"
+
+before_install:
+  - go get github.com/faiface/mainthread
+  - go get github.com/go-gl/gl/v2.1/gl
+  - go get github.com/go-gl/glfw/v3.2/glfw
