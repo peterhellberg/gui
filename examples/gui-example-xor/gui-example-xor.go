@@ -2,9 +2,9 @@ package main
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 
-	"github.com/peterhellberg/gfx"
 	"github.com/peterhellberg/gui"
 )
 
@@ -50,7 +50,7 @@ func update(dst draw.Image) image.Rectangle {
 		for y := 0; y < bounds.Max.Y; y++ {
 			c := uint8(x ^ y)
 
-			dst.Set(x, y, gfx.ColorNRGBA(c, c%192, c, 255))
+			dst.Set(x, y, color.NRGBA{c, c % 192, c, 255})
 		}
 	}
 
