@@ -35,7 +35,7 @@ func main() {
 
 func loop() {
 	win, err := gui.Open(
-		gui.Title("qui-xor"),
+		gui.Title("gui-xor"),
 		gui.Size(512, 512),
 		gui.Decorated(true),
 		gui.Resizable(true),
