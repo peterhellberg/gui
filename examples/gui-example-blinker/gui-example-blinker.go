@@ -24,10 +24,10 @@ func loop() {
 	mux, env := gui.NewMux(win)
 
 	// we create four blinkers, each with its own Env from the mux
-	go blinker(mux.MakeEnv(), image.Rect(100, 100, 350, 250))
-	go blinker(mux.MakeEnv(), image.Rect(450, 100, 700, 250))
-	go blinker(mux.MakeEnv(), image.Rect(100, 350, 350, 500))
-	go blinker(mux.MakeEnv(), image.Rect(450, 350, 700, 500))
+	go blinker(mux.Env(), image.Rect(100, 100, 350, 250))
+	go blinker(mux.Env(), image.Rect(450, 100, 700, 250))
+	go blinker(mux.Env(), image.Rect(100, 350, 350, 500))
+	go blinker(mux.Env(), image.Rect(450, 350, 700, 500))
 
 	// we use the master env now, win is used by the mux
 	for event := range env.Events() {
