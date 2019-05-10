@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/peterhellberg/gui?style=flat)](https://goreportcard.com/report/github.com/peterhellberg/gui)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/peterhellberg/gui)
 
-Minimal GUI in Go based on <https://github.com/faiface/gui>
+Minimal GUI in Go initially based on <https://github.com/faiface/gui>
 
 > NOTE: This is just my take on how to handle events (interface instead of string)
 > and you should most likely use <https://github.com/faiface/gui>
