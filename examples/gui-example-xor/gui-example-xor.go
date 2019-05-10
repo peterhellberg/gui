@@ -39,16 +39,20 @@ func loop() {
 			win.Draw() <- update
 		}
 
-		gfx.Log("Event: %+v", event)
+		gui.Log("Event: %+v", event)
 	}
 }
 
 func update(dst draw.Image) image.Rectangle {
-	gfx.EachPixel(dst.Bounds(), func(x, y int) {
-		c := uint8(x ^ y)
+	bounds := dst.Bounds()
 
-		dst.Set(x, y, gfx.ColorNRGBA(c, c%192, c, 255))
-	})
+	for x := 0; x < bounds.Max.X; x++ {
+		for y := 0; y < bounds.Max.Y; y++ {
+			c := uint8(x ^ y)
 
-	return dst.Bounds()
+			dst.Set(x, y, gfx.ColorNRGBA(c, c%192, c, 255))
+		}
+	}
+
+	return bounds
 }
