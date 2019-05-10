@@ -45,7 +45,7 @@ func loop() {
 		gui.Resizable(true),
 	)
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	for event := range win.Events() {
