@@ -119,7 +119,7 @@ func loop() {
 	go blinker(mux.MakeEnv(), image.Rect(100, 350, 350, 500))
 	go blinker(mux.MakeEnv(), image.Rect(450, 350, 700, 500))
 
-	// we use the master env now, w is used by the mux
+	// we use the master env now, win is used by the mux
 	for event := range env.Events() {
 		switch event.Name() {
 		case gui.EventClose:
@@ -139,12 +139,13 @@ func loop() {
 func blinker(env gui.Env, r image.Rectangle) {
 	// redraw takes a bool and produces a draw command
 	redraw := func(visible bool) func(draw.Image) image.Rectangle {
-		return func(drw draw.Image) image.Rectangle {
+		return func(dst draw.Image) image.Rectangle {
 			if visible {
-				draw.Draw(drw, r, image.White, image.ZP, draw.Src)
+				draw.Draw(dst, r, image.White, image.ZP, draw.Src)
 			} else {
-				draw.Draw(drw, r, image.Black, image.ZP, draw.Src)
+				draw.Draw(dst, r, image.Black, image.ZP, draw.Src)
 			}
+
 			return r
 		}
 	}
@@ -155,11 +156,8 @@ func blinker(env gui.Env, r image.Rectangle) {
 	for event := range env.Events() {
 		switch event.Name() {
 		case gui.EventMouseLeftDown:
-			pt := event.Data().(image.Point)
-
-			if pt.In(r) {
-				// user clicked on the rectangle
-				// we blink 3 times
+			if event.Data().(image.Point).In(r) {
+				// user clicked on the rectangle we blink 3 times
 				for i := 0; i < 3; i++ {
 					env.Draw() <- redraw(false)
 					time.Sleep(time.Second / 3)
