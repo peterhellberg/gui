@@ -54,8 +54,8 @@ func NewMux(env Env) (mux *Mux, master Env) {
 	return mux, master
 }
 
-// MakeEnv creates a new virtual Env that interacts with the root Env of the Mux.
-func (mux *Mux) MakeEnv() Env {
+// Env creates a new virtual Env that interacts with the root Env of the Mux.
+func (mux *Mux) Env() Env {
 	return mux.makeEnv(false)
 }
 
@@ -70,6 +70,10 @@ func (m *muxEnv) Events() <-chan Event {
 
 func (m *muxEnv) Draw() chan<- func(draw.Image) image.Rectangle {
 	return m.draw
+}
+
+func (m *muxEnv) Close() {
+	close(m.Draw())
 }
 
 func (mux *Mux) makeEnv(master bool) Env {

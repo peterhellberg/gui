@@ -19,9 +19,9 @@ func TestNewMux(t *testing.T) {
 	})
 }
 
-func TestMakeEnv(t *testing.T) {
+func TestEnv(t *testing.T) {
 	mux := &Mux{}
-	mux.MakeEnv()
+	mux.Env()
 }
 
 func TestMuxEnvEvents(t *testing.T) {
