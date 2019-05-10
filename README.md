@@ -1,5 +1,9 @@
 # peterhellberg/gui
 
+[![Build Status](https://travis-ci.org/peterhellberg/gui.svg?branch=master)](https://travis-ci.org/peterhellberg/gui)
+[![Go Report Card](https://goreportcard.com/badge/github.com/peterhellberg/gui?style=flat)](https://goreportcard.com/report/github.com/peterhellberg/gui)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/peterhellberg/gui)
+
 Minimal GUI in Go based on <https://github.com/faiface/gui>
 
 > NOTE: This is just my take on how to handle events (interface instead of string)
@@ -13,6 +17,7 @@ Minimal GUI in Go based on <https://github.com/faiface/gui>
 
 ## Example
 
+[embedmd]:# (examples/gui-example-xor/gui-example-xor.go)
 ```go
 package main
 
@@ -30,7 +35,7 @@ func main() {
 
 func loop() {
 	win, err := gui.New(
-		gui.Title("qui-xor"),
+		gui.Title("qui-example-xor"),
 		gui.Size(512, 512),
 		gui.Decorated(true),
 		gui.Resizable(true),
