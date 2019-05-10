@@ -43,10 +43,10 @@ type Window struct {
 	ratio int
 }
 
-// New creates a new window with all the supplied options.
+// Open a new window with all the supplied options.
 //
 // The default title is empty and the default size is 640x480.
-func New(opts ...Option) (*Window, error) {
+func Open(opts ...Option) (*Window, error) {
 	o := newOptions(opts...)
 	w := newWindow()
 
