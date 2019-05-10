@@ -10,6 +10,22 @@ type options struct {
 	decorated     bool
 }
 
+func newOptions(opts ...Option) options {
+	o := options{
+		title:     "",
+		width:     640,
+		height:    480,
+		resizable: false,
+		decorated: true,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	return o
+}
+
 // Title option sets the title (caption) of the window.
 func Title(title string) Option {
 	return func(o *options) {
@@ -26,15 +42,15 @@ func Size(width, height int) Option {
 }
 
 // Resizable option makes the window resizable by the user.
-func Resizable(b bool) Option {
+func Resizable(resizable bool) Option {
 	return func(o *options) {
-		o.resizable = b
+		o.resizable = resizable
 	}
 }
 
 // Decorated options controls if the window should have any chrome.
-func Decorated(b bool) Option {
+func Decorated(decorated bool) Option {
 	return func(o *options) {
-		o.decorated = b
+		o.decorated = decorated
 	}
 }

@@ -17,6 +17,18 @@ func Run(fn func()) {
 	mainthread.Run(fn)
 }
 
+func newWindow() *Window {
+	eventsOut, eventsIn := makeEventsChan()
+
+	return &Window{
+		out:     eventsOut,
+		in:      eventsIn,
+		draw:    make(chan func(draw.Image) image.Rectangle),
+		newSize: make(chan image.Rectangle),
+		finish:  make(chan struct{}),
+	}
+}
+
 // Window is an Env that handles an actual graphical window.
 type Window struct {
 	out  <-chan Event
@@ -35,26 +47,8 @@ type Window struct {
 //
 // The default title is empty and the default size is 640x480.
 func New(opts ...Option) (*Window, error) {
-	o := options{
-		title:     "",
-		width:     640,
-		height:    480,
-		resizable: false,
-		decorated: true,
-	}
-	for _, opt := range opts {
-		opt(&o)
-	}
-
-	eventsOut, eventsIn := makeEventsChan()
-
-	w := &Window{
-		out:     eventsOut,
-		in:      eventsIn,
-		draw:    make(chan func(draw.Image) image.Rectangle),
-		newSize: make(chan image.Rectangle),
-		finish:  make(chan struct{}),
-	}
+	o := newOptions(opts...)
+	w := newWindow()
 
 	var err error
 
@@ -237,12 +231,15 @@ loop:
 
 func (w *Window) openGLFlush(r image.Rectangle) {
 	bounds := w.img.Bounds()
+
 	r = r.Intersect(bounds)
+
 	if r.Empty() {
 		return
 	}
 
 	tmp := image.NewRGBA(r)
+
 	draw.Draw(tmp, r, w.img, r.Min, draw.Src)
 
 	gl.DrawBuffer(gl.FRONT)

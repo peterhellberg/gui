@@ -24,14 +24,6 @@ type Event interface {
 	Data() interface{}
 }
 
-// NewEvent creates a new Event
-func NewEvent(name string, data interface{}) Event {
-	return &event{
-		name: name,
-		data: data,
-	}
-}
-
 type event struct {
 	name string
 	data interface{}
