@@ -31,7 +31,8 @@ func NewMux(env Env) (mux *Mux, master Env) {
 
 	go func() {
 		for e := range env.Events() {
-			if e.Name() == "resize" {
+			switch e := e.(type) {
+			case EventResize:
 				mux.mu.Lock()
 				mux.lastResize = e
 				mux.mu.Unlock()
@@ -68,7 +69,7 @@ func (m *muxEnv) Events() <-chan Event {
 	return m.events
 }
 
-func (m *muxEnv) Draw(fn func(draw.Image) image.Rectangle) {
+func (m *muxEnv) Draw(fn DrawFunc) {
 	m.draw <- fn
 }
 
