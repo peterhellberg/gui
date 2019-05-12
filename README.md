@@ -61,7 +61,7 @@ func loop() {
 				win.Close()
 			}
 		case gui.EventResize:
-			win.Draw() <- update
+			win.Draw(update)
 		}
 
 		gui.Log("Event: %+v", event)
@@ -151,7 +151,7 @@ func blinker(env gui.Env, r image.Rectangle) {
 	}
 
 	// first we draw a white rectangle
-	env.Draw() <- redraw(true)
+	env.Draw(redraw(true))
 
 	for event := range env.Events() {
 		switch event := event.(type) {
@@ -159,16 +159,16 @@ func blinker(env gui.Env, r image.Rectangle) {
 			if event.In(r) {
 				// user clicked on the rectangle we blink 3 times
 				for i := 0; i < 3; i++ {
-					env.Draw() <- redraw(false)
+					env.Draw(redraw(false))
 					time.Sleep(time.Second / 3)
 
-					env.Draw() <- redraw(true)
+					env.Draw(redraw(true))
 					time.Sleep(time.Second / 3)
 				}
 			}
 		}
 	}
 
-	close(env.Draw())
+	env.Close()
 }
 ```

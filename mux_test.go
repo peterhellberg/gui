@@ -34,9 +34,9 @@ func TestMuxEnvDraw(t *testing.T) {
 		draw: make(chan func(draw.Image) image.Rectangle, 1),
 	}
 
-	me.Draw() <- func(dst draw.Image) image.Rectangle {
+	me.Draw(func(dst draw.Image) image.Rectangle {
 		dst.Set(0, 0, color.RGBA{255, 0, 0, 255})
 
 		return dst.Bounds()
-	}
+	})
 }

@@ -23,10 +23,10 @@ func NewMux(env Env) (mux *Mux, master Env) {
 
 	go func() {
 		for d := range drawChan {
-			env.Draw() <- d
+			env.Draw(d)
 		}
 
-		close(env.Draw())
+		env.Close()
 	}()
 
 	go func() {
@@ -68,12 +68,12 @@ func (m *muxEnv) Events() <-chan Event {
 	return m.events
 }
 
-func (m *muxEnv) Draw() chan<- func(draw.Image) image.Rectangle {
-	return m.draw
+func (m *muxEnv) Draw(fn func(draw.Image) image.Rectangle) {
+	m.draw <- fn
 }
 
 func (m *muxEnv) Close() {
-	close(m.Draw())
+	close(m.draw)
 }
 
 func (mux *Mux) makeEnv(master bool) Env {

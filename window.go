@@ -93,12 +93,14 @@ func Open(opts ...Option) (*Window, error) {
 // Events returns the events channel of the window.
 func (w *Window) Events() <-chan Event { return w.out }
 
-// Draw returns the draw channel of the window.
-func (w *Window) Draw() chan<- func(draw.Image) image.Rectangle { return w.draw }
+// Draw to the window using the provided function.
+func (w *Window) Draw(fn func(draw.Image) image.Rectangle) {
+	w.draw <- fn
+}
 
 // Close closes the draw channel
 func (w *Window) Close() {
-	close(w.Draw())
+	close(w.draw)
 }
 
 func (w *Window) eventThread() {

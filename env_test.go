@@ -12,7 +12,7 @@ func TestWindowIsEnv(t *testing.T) {
 
 type mockEnv struct {
 	EventsFn func() <-chan Event
-	DrawFn   func() chan<- func(draw.Image) image.Rectangle
+	DrawFn   func(func(draw.Image) image.Rectangle)
 }
 
 func (env *mockEnv) Events() <-chan Event {
@@ -23,12 +23,12 @@ func (env *mockEnv) Events() <-chan Event {
 	return env.EventsFn()
 }
 
-func (env *mockEnv) Draw() chan<- func(draw.Image) image.Rectangle {
+func (env *mockEnv) Draw(fn func(draw.Image) image.Rectangle) {
 	if env.DrawFn == nil {
 		panic("*mockEnv.Draw called, but it is not mocked")
 	}
 
-	return env.DrawFn()
+	env.DrawFn(fn)
 }
 
 func (env *mockEnv) Close() {}

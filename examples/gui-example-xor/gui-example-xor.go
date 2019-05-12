@@ -36,7 +36,7 @@ func loop() {
 				win.Close()
 			}
 		case gui.EventResize:
-			win.Draw() <- update
+			win.Draw(update)
 		}
 
 		gui.Log("Event: %+v", event)

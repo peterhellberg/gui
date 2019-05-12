@@ -17,8 +17,8 @@ func TestBlinker(t *testing.T) {
 
 			return ch
 		},
-		DrawFn: func() chan<- func(draw.Image) image.Rectangle {
-			return make(chan func(draw.Image) image.Rectangle, 1)
+		DrawFn: func(func(draw.Image) image.Rectangle) {
+
 		},
 	}
 
@@ -27,7 +27,7 @@ func TestBlinker(t *testing.T) {
 
 type mockEnv struct {
 	EventsFn func() <-chan gui.Event
-	DrawFn   func() chan<- func(draw.Image) image.Rectangle
+	DrawFn   func(func(draw.Image) image.Rectangle)
 }
 
 func (env *mockEnv) Events() <-chan gui.Event {
@@ -38,12 +38,12 @@ func (env *mockEnv) Events() <-chan gui.Event {
 	return env.EventsFn()
 }
 
-func (env *mockEnv) Draw() chan<- func(draw.Image) image.Rectangle {
+func (env *mockEnv) Draw(fn func(draw.Image) image.Rectangle) {
 	if env.DrawFn == nil {
 		panic("*mockEnv.Draw called, but it is not mocked")
 	}
 
-	return env.DrawFn()
+	env.DrawFn(fn)
 }
 
 func (env *mockEnv) Close() {}
