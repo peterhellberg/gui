@@ -36,7 +36,7 @@ func loop() {
 			win.Close()
 		case gui.EventKeyboardDown:
 			if event.Key == "escape" {
-				win.Close
+				win.Close()
 			}
 		case gui.EventKeyboardChar:
 			if event.Char == 'q' {
