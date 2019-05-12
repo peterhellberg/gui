@@ -49,15 +49,15 @@ func loop() {
 	}
 
 	for event := range win.Events() {
-		switch event.Name() {
+		switch event := event.(type) {
 		case gui.EventClose:
 			win.Close()
 		case gui.EventKeyboardDown:
-			if event.Data().(string) == "escape" {
+			if event.Key == "escape" {
 				win.Close()
 			}
 		case gui.EventKeyboardChar:
-			if event.Data().(rune) == 'q' {
+			if event.Char == 'q' {
 				win.Close()
 			}
 		case gui.EventResize:
@@ -121,15 +121,15 @@ func loop() {
 
 	// we use the master env now, win is used by the mux
 	for event := range env.Events() {
-		switch event.Name() {
+		switch event := event.(type) {
 		case gui.EventClose:
 			win.Close()
 		case gui.EventKeyboardDown:
-			if event.Data().(string) == "escape" {
-				win.Close()
+			if event.Key == "escape" {
+				win.Close
 			}
 		case gui.EventKeyboardChar:
-			if event.Data().(rune) == 'q' {
+			if event.Char == 'q' {
 				win.Close()
 			}
 		}
@@ -154,9 +154,9 @@ func blinker(env gui.Env, r image.Rectangle) {
 	env.Draw() <- redraw(true)
 
 	for event := range env.Events() {
-		switch event.Name() {
+		switch event := event.(type) {
 		case gui.EventMouseLeftDown:
-			if event.Data().(image.Point).In(r) {
+			if event.In(r) {
 				// user clicked on the rectangle we blink 3 times
 				for i := 0; i < 3; i++ {
 					env.Draw() <- redraw(false)

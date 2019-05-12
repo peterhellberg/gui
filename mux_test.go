@@ -12,7 +12,7 @@ func TestNewMux(t *testing.T) {
 		EventsFn: func() <-chan Event {
 			ch := make(chan Event, 1)
 
-			ch <- event{name: "resize"}
+			ch <- EventResize{}
 
 			return ch
 		},

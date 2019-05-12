@@ -18,11 +18,11 @@ func Run(fn func()) {
 }
 
 func newWindow() *Window {
-	eventsOut, eventsIn := makeEventsChan()
+	out, in := makeEventsChan()
 
 	return &Window{
-		out:     eventsOut,
-		in:      eventsIn,
+		out:     out,
+		in:      in,
 		draw:    make(chan func(draw.Image) image.Rectangle),
 		newSize: make(chan image.Rectangle),
 		finish:  make(chan struct{}),
@@ -106,36 +106,34 @@ func (w *Window) eventThread() {
 
 	w.w.SetCursorPosCallback(func(_ *glfw.Window, x, y float64) {
 		moX, moY = int(x), int(y)
-		w.in <- event{EventMouseMove, image.Point{moX * w.ratio, moY * w.ratio}}
+		w.in <- EventMouseMove{image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetMouseButtonCallback(func(_ *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
-		var name string
+		pos := image.Point{moX * w.ratio, moY * w.ratio}
 
 		switch {
 		case button == glfw.MouseButtonLeft && action == glfw.Press:
-			name = EventMouseLeftDown
+			w.in <- EventMouseLeftDown{pos}
 		case button == glfw.MouseButtonLeft && action == glfw.Release:
-			name = EventMouseLeftUp
+			w.in <- EventMouseLeftUp{pos}
 		case button == glfw.MouseButtonMiddle && action == glfw.Press:
-			name = EventMouseMiddleDown
+			w.in <- EventMouseMiddleDown{pos}
 		case button == glfw.MouseButtonMiddle && action == glfw.Release:
-			name = EventMouseMiddleUp
+			w.in <- EventMouseMiddleUp{pos}
 		case button == glfw.MouseButtonRight && action == glfw.Press:
-			name = EventMouseRightDown
+			w.in <- EventMouseRightDown{pos}
 		case button == glfw.MouseButtonRight && action == glfw.Release:
-			name = EventMouseRightUp
+			w.in <- EventMouseRightUp{pos}
 		}
-
-		w.in <- event{name, image.Point{moX * w.ratio, moY * w.ratio}}
 	})
 
 	w.w.SetScrollCallback(func(_ *glfw.Window, xoff, yoff float64) {
-		w.in <- event{EventMouseScroll, image.Point{int(xoff), int(yoff)}}
+		w.in <- EventMouseScroll{image.Point{int(xoff), int(yoff)}}
 	})
 
 	w.w.SetCharCallback(func(_ *glfw.Window, r rune) {
-		w.in <- event{EventKeyboardChar, r}
+		w.in <- EventKeyboardChar{r}
 	})
 
 	w.w.SetKeyCallback(func(_ *glfw.Window, key glfw.Key, _ int, action glfw.Action, _ glfw.ModifierKey) {
@@ -146,25 +144,25 @@ func (w *Window) eventThread() {
 
 		switch action {
 		case glfw.Press:
-			w.in <- event{EventKeyboardDown, k}
+			w.in <- EventKeyboardDown{k}
 		case glfw.Release:
-			w.in <- event{EventKeyboardUp, k}
+			w.in <- EventKeyboardUp{k}
 		case glfw.Repeat:
-			w.in <- event{EventKeyboardRepeat, k}
+			w.in <- EventKeyboardRepeat{k}
 		}
 	})
 
 	w.w.SetFramebufferSizeCallback(func(_ *glfw.Window, width, height int) {
 		r := image.Rect(0, 0, width, height)
 		w.newSize <- r
-		w.in <- event{EventResize, r}
+		w.in <- EventResize{r}
 	})
 
 	w.w.SetCloseCallback(func(_ *glfw.Window) {
-		w.in <- event{EventClose, nil}
+		w.in <- EventClose{}
 	})
 
-	w.in <- event{EventResize, w.img.Bounds()}
+	w.in <- EventResize{w.img.Bounds()}
 
 	for {
 		select {

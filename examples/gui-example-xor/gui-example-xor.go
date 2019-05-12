@@ -24,15 +24,15 @@ func loop() {
 	}
 
 	for event := range win.Events() {
-		switch event.Name() {
+		switch event := event.(type) {
 		case gui.EventClose:
 			win.Close()
 		case gui.EventKeyboardDown:
-			if event.Data().(string) == "escape" {
+			if event.Key == "escape" {
 				win.Close()
 			}
 		case gui.EventKeyboardChar:
-			if event.Data().(rune) == 'q' {
+			if event.Char == 'q' {
 				win.Close()
 			}
 		case gui.EventResize:

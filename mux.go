@@ -31,7 +31,7 @@ func NewMux(env Env) (mux *Mux, master Env) {
 
 	go func() {
 		for e := range env.Events() {
-			if e.Name() == EventResize {
+			if e.Name() == "resize" {
 				mux.mu.Lock()
 				mux.lastResize = e
 				mux.mu.Unlock()
