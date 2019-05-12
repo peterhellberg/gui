@@ -31,4 +31,4 @@ func (env *mockEnv) Draw() chan<- func(draw.Image) image.Rectangle {
 	return env.DrawFn()
 }
 
-func (enc *mockEnv) Close() {}
+func (env *mockEnv) Close() {}
