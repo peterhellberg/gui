@@ -93,11 +93,8 @@ func Open(opts ...Option) (*Window, error) {
 // Events returns the events channel of the window.
 func (w *Window) Events() <-chan Event { return w.out }
 
-// DrawFunc is a function used to draw to the window.
-type DrawFunc func(draw.Image) image.Rectangle
-
 // Draw to the window using the provided function.
-func (w *Window) Draw(fn DrawFunc) {
+func (w *Window) Draw(fn func(draw.Image) image.Rectangle) {
 	w.draw <- fn
 }
 

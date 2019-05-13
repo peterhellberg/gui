@@ -17,9 +17,7 @@ func TestBlinker(t *testing.T) {
 
 			return ch
 		},
-		DrawFn: func(func(draw.Image) image.Rectangle) {
-
-		},
+		DrawFn: func(func(draw.Image) image.Rectangle) {},
 	}
 
 	blinker(env, image.ZR)

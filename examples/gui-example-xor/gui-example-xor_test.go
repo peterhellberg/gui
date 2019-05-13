@@ -3,17 +3,56 @@ package main
 import (
 	"image"
 	"image/color"
-	"testing"
+	"image/draw"
+
+	"github.com/peterhellberg/gui"
 )
 
-func TestUpdate(t *testing.T) {
-	dst := image.NewRGBA(image.Rect(0, 0, 512, 512))
+func main() {
+	gui.Run(loop)
+}
 
-	update(dst)
-
-	w, h, c := 110, 140, color.RGBA{226, 34, 226, 255}
-
-	if got, want := dst.At(w, h), c; got != want {
-		t.Fatalf("dst.At(%d, %d) = %v, want %v", w, h, got, want)
+func loop() {
+	win, err := gui.Open(
+		gui.Title("gui-xor"),
+		gui.Size(512, 512),
+		gui.Decorated(true),
+		gui.Resizable(true),
+	)
+	if err != nil {
+		panic(err)
 	}
+
+	for event := range win.Events() {
+		switch event := event.(type) {
+		case gui.EventClose:
+			win.Close()
+		case gui.EventKeyboardDown:
+			if event.Key == "escape" {
+				win.Close()
+			}
+		case gui.EventKeyboardChar:
+			if event.Char == 'q' {
+				win.Close()
+			}
+		case gui.EventResize:
+			win.Draw(update)
+		}
+
+		gui.Log("Event: %+v", event)
+	}
+}
+
+func update(dst draw.Image) image.Rectangle {
+	bounds := dst.Bounds()
+
+	for x := 0; x < bounds.Max.X; x++ {
+		for y := 0; y < bounds.Max.Y; y++ {
+			c := uint8(x ^ y)
+
+			dst.Set(x, y, color.NRGBA{c, c % 192, c, 255})
+		}
+	}
+
+	return bounds
 }

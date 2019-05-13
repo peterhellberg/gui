@@ -69,7 +69,7 @@ func (m *muxEnv) Events() <-chan Event {
 	return m.events
 }
 
-func (m *muxEnv) Draw(fn DrawFunc) {
+func (m *muxEnv) Draw(fn func(draw.Image) image.Rectangle) {
 	m.draw <- fn
 }
 
