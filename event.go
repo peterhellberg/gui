@@ -23,7 +23,7 @@ func (r EventResize) Data() interface{} {
 	return r.Rectangle
 }
 
-// Close event
+// EventClose event
 type EventClose struct{}
 
 // Name of event
@@ -43,7 +43,7 @@ type EventMouseMove struct {
 
 // Name of event
 func (mm EventMouseMove) Name() string {
-	return "mouse"
+	return "mouse/move"
 }
 
 // Data for event
