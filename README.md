@@ -4,18 +4,53 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/peterhellberg/gui?style=flat)](https://goreportcard.com/report/github.com/peterhellberg/gui)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/peterhellberg/gui)
 
-Minimal GUI in Go initially based on <https://github.com/faiface/gui>
-
-> NOTE: This is just my take on how to handle events (interface instead of string)
-> and you should most likely use <https://github.com/faiface/gui>
+Minimal GUI in Go, it was initially based on <https://github.com/faiface/gui> but has since diverged from the original project.
 
 ## Dependencies
 
-- <https://github.com/faiface/mainthread>
-- <https://github.com/go-gl/gl>
-- <https://github.com/go-gl/glfw>
+This package has a few third party dependencies:
+
+- <https://github.com/faiface/mainthread> - Run stuff on the main thread in Go
+- <https://github.com/go-gl/gl> - Go bindings for OpenGL (generated via glow)
+- <https://github.com/go-gl/glfw> - Go bindings for GLFW 3
 
 ## Examples
+
+### Minimal
+
+![gui-minimal](https://user-images.githubusercontent.com/565124/57968481-83ba5880-796b-11e9-8339-934a8d7a542c.png)
+
+[embedmd]:# (examples/gui-example-minimal/gui-example-minimal.go)
+```go
+package main
+
+import (
+	"image"
+	"image/draw"
+
+	"github.com/peterhellberg/gui"
+)
+
+func main() {
+	gui.Run(func() {
+		win, err := gui.Open(gui.Title("gui-minimal"))
+		if err != nil {
+			panic(err)
+		}
+
+		for event := range win.Events() {
+			switch event.(type) {
+			case gui.EventClose:
+				win.Close()
+			case gui.EventResize:
+				win.Draw(func(dst draw.Image) image.Rectangle {
+					return dst.Bounds()
+				})
+			}
+		}
+	})
+}
+```
 
 ### XOR
 
