@@ -1,11 +1,29 @@
 package gui
 
-import "image"
+import (
+	"image"
+	"time"
+)
 
 // Event includes its name and data.
 type Event interface {
 	Name() string
 	Data() interface{}
+}
+
+// EventUpdate event
+type EventUpdate struct {
+	time.Time
+}
+
+// Name of event
+func (t EventUpdate) Name() string {
+	return "update"
+}
+
+// Data for event
+func (t EventUpdate) Data() interface{} {
+	return t.Time
 }
 
 // EventResize event
