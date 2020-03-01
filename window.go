@@ -90,6 +90,10 @@ func Open(opts ...Option) (*Window, error) {
 	return w, nil
 }
 
+func (w *Window) Send(e Event) {
+	w.in <- e
+}
+
 // Events returns the events channel of the window.
 func (w *Window) Events() <-chan Event { return w.out }
 
