@@ -1,11 +1,13 @@
 language: go
 
+dist: bionic
+
 go:
- - "1.12.5"
- - "1.11.10"
+ - "1.14"
+ - "1.13.8"
 
 before_install:
-  - sudo apt-get install -y xorg-dev
+  - sudo apt-get install -y xorg-dev libgl1-mesa-dev
   - go get github.com/faiface/mainthread
   - go get github.com/go-gl/gl/v2.1/gl
   - go get github.com/go-gl/glfw/v3.2/glfw
